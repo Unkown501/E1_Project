@@ -10,18 +10,27 @@ public class PlayerController : MonoBehaviour
     bool onGround;
     int score = 0;
      [SerializeField] int jumpforce = 300;
+    [SerializeField] float dashSpeed = 30f;
+    [SerializeField] float dashTime = 0.9f;
+
+    float lastDir = 1f;
+    bool isDashing = false;
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
     }
 
     // Update is called once per frame
-    void FixedUpdate()
-    {
-        /*float movementDistanceX = movementx * speed * Time.deltaTime;
-        float movementDistanceY = movementy * speed * Time.deltaTime;
-        transform.position = new Vector2(transform.position.x + movementDistanceX, transform.position.y + movementDistanceY);*/
+    void FixedUpdate(){
+        if (isDashing) return;
+
         rb.linearVelocity = new Vector2(movementx * speed, rb.linearVelocity.y);
+
+        if (movementx != 0)
+        {
+            lastDir = Mathf.Sign(movementx);
+        }
+
         if (onGround && movementy > 0)
         {
             rb.AddForce(new Vector2(0, jumpforce));
@@ -60,5 +69,27 @@ public class PlayerController : MonoBehaviour
             other.gameObject.SetActive(false);
             Debug.Log("socre:" + score);
         }
+    }
+    void OnDash(){
+        if (!isDashing)
+            StartCoroutine(DashRoutine());
+    }
+    System.Collections.IEnumerator DashRoutine()
+    {
+        isDashing = true;
+
+        float dir = (movementx != 0) ? Mathf.Sign(movementx) : lastDir;
+
+        float oldGravity = rb.gravityScale;
+        rb.gravityScale = 0f;
+
+        rb.linearVelocity = new Vector2(dir * dashSpeed, 0f);
+
+        yield return new WaitForSeconds(dashTime);
+
+        rb.linearVelocity = new Vector2(0f, rb.linearVelocity.y);
+        rb.gravityScale = oldGravity;
+
+        isDashing = false;
     }
 }
