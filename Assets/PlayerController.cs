@@ -15,9 +15,13 @@ public class PlayerController : MonoBehaviour
 
     float lastDir = 1f;
     bool isDashing = false;
+    Animator animator;
+    SpriteRenderer spriteRenderer;
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+        animator= GetComponent<Animator>();
+        spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
     // Update is called once per frame
@@ -25,6 +29,13 @@ public class PlayerController : MonoBehaviour
         if (isDashing) return;
 
         rb.linearVelocity = new Vector2(movementx * speed, rb.linearVelocity.y);
+        if(!Mathf.Approximately(movementx,0f))
+        {
+            animator.SetBool("is_running",true);
+            spriteRenderer.flipX = movementx<0;
+        }else{
+            animator.SetBool("is_running",false);
+        }
 
         if (movementx != 0)
         {
