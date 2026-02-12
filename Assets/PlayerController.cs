@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+
 public class PlayerController : MonoBehaviour
 {
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -9,9 +10,13 @@ public class PlayerController : MonoBehaviour
     Rigidbody2D rb;
     bool onGround;
     int score = 0;
-     [SerializeField] int jumpforce = 300;
+    [SerializeField] int jumpforce = 300;
     [SerializeField] float dashSpeed = 30f;
     [SerializeField] float dashTime = 0.9f;
+    [SerializeField] AudioSource source;
+    [SerializeField] AudioClip jumpClip;
+    [SerializeField] GameManager gameManger;
+
 
     float lastDir = 1f;
     bool isDashing = false;
@@ -45,6 +50,7 @@ public class PlayerController : MonoBehaviour
         if (onGround && movementy > 0)
         {
             rb.AddForce(new Vector2(0, jumpforce));
+            source.PlayOneShot(jumpClip);
         }
     }
     void OnMove(InputValue value)
@@ -79,6 +85,7 @@ public class PlayerController : MonoBehaviour
             score++;
             other.gameObject.SetActive(false);
             Debug.Log("socre:" + score);
+            gameManger.UpdateScore(score);
         }
     }
     void OnDash(){
